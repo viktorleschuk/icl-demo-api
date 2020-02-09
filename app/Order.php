@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
+    protected $fillable = [
+        'user_id',
+        'client_name',
+        'client_phone',
+        'client_address'
+    ];
+
     /**
      * Get the user related with the order
      *

@@ -19,5 +19,5 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('auth/logout', 'Auth\LoginController@logout');
 
     Route::resource('orders', 'OrderController', ['only' => ['index', 'show', 'store', 'update', 'destroy']]);
-    Route::resource('orders.items', 'OrderItemController', ['only' => ['index', 'show', 'store', 'update', 'destroy']]);
+    Route::resource('orders.items', 'OrderItemController', ['only' => ['index', 'store', 'update', 'destroy']]);
 });
