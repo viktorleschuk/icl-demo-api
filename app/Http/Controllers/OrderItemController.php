@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OrderItems\ImportRequest;
 use App\Http\Requests\Orders\DestroyRequest;
 use App\Http\Requests\Orders\IndexRequest;
 use App\Http\Requests\Orders\ShowRequest;
 use App\Http\Requests\Orders\StoreRequest;
 use App\Http\Requests\Orders\UpdateRequest;
+use App\Jobs\HandleCsvFile;
 use App\Order;
 use App\OrderItem;
+use App\Http\Resources\OrderItem as OrderItemResource;
 
 class OrderItemController extends Controller
 {
@@ -20,47 +23,23 @@ class OrderItemController extends Controller
     {
         $items = $order->items();
 
-        //TODO: filters
-
-        return response()->json($items->get());
+        return OrderItemResource::collection($items->get());
     }
 
     /**
-     * @param StoreRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(StoreRequest $request)
-    {
-        /** @var \App\User $user */
-        $user = auth()->user();
-
-        $order = $user->orders()->create($request->all());
-
-        return response()->json($order);
-    }
-
-    /**
-     * @param UpdateRequest $request
+     * @param ImportRequest $request
      * @param Order $order
-     * @return Order
+     * @return mixed
      */
-    public function update(UpdateRequest $request, Order $order, OrderItem $item)
+    public function import(ImportRequest $request, Order $order)
     {
-        $item->update($request->only($item->getFillable()));
+        $items = $this->dispatch(new HandleCsvFile($request->file('file')));
+        array_walk($items, function (&$item) use ($order) {
+            $item['order_id'] = $order->getKey();
+        });
 
-        return $order;
-    }
+        $order->items()->insert($items);
 
-    /**
-     * @param DestroyRequest $request
-     * @param Order $order
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
-     */
-    public function destroy(DestroyRequest $request, Order $order, OrderItem $item)
-    {
-        $item->delete();
-
-        return response()->json($item);
+        return OrderItemResource::collection($order->items);
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\Orders\IndexRequest;
 use App\Http\Requests\Orders\ShowRequest;
 use App\Http\Requests\Orders\StoreRequest;
 use App\Http\Requests\Orders\UpdateRequest;
+use App\Http\Resources\Order as OrderResource;
 use App\Order;
 
 /**
@@ -17,63 +18,67 @@ class OrderController extends Controller
 {
     /**
      * @param IndexRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(IndexRequest $request)
     {
         $orders = auth()->user()->orders();
 
-        //TODO: filters
+        if ($request->filled('filter')) {
+            $orders->filter($request->get('filter'));
+        }
 
-        return response()->json($orders->get());
+        return OrderResource::collection($orders->paginate($request->get('page_size', 10)));
     }
 
     /**
      * @param ShowRequest $request
      * @param Order $order
-     * @return \Illuminate\Http\JsonResponse
+     * @return OrderResource
      */
     public function show(ShowRequest $request, Order $order)
     {
-        return response()->json($order);
+        $order->load('items');
+
+        return new OrderResource($order);
     }
 
     /**
      * @param StoreRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return OrderResource
      */
     public function store(StoreRequest $request)
     {
         /** @var \App\User $user */
         $user = auth()->user();
 
-        $order = $user->orders()->create($request->all());
+        $order = $user->orders()->create($request->only('client_name', 'client_phone', 'client_address'));
 
-        return response()->json($order);
+        return new OrderResource($order);
     }
 
     /**
      * @param UpdateRequest $request
      * @param Order $order
-     * @return Order
+     * @return OrderResource
      */
     public function update(UpdateRequest $request, Order $order)
     {
         $order->update($request->only($order->getFillable()));
 
-        return $order;
+        return new OrderResource($order);
     }
 
     /**
      * @param DestroyRequest $request
      * @param Order $order
-     * @return \Illuminate\Http\JsonResponse
+     * @return OrderResource
      * @throws \Exception
      */
     public function destroy(DestroyRequest $request, Order $order)
     {
         $order->delete();
 
-        return response()->json($order);
+        return new OrderResource($order);
     }
 }

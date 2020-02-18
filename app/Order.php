@@ -2,15 +2,27 @@
 
 namespace App;
 
+use App\Helpers\Traits\Filterable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
+    use Filterable;
+
     protected $fillable = [
         'user_id',
         'client_name',
         'client_phone',
         'client_address'
+    ];
+
+    protected $appends = [
+        'total_sum'
+    ];
+
+    protected $withCount = [
+        'items'
     ];
 
     /**
@@ -31,5 +43,15 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Total sum accessor
+     *
+     * @return mixed
+     */
+    public function getTotalSumAttribute()
+    {
+        return $this->items()->sum(DB::raw('quantity * price'));
     }
 }
