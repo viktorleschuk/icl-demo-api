@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests\Orders;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateRequest extends Request
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +24,7 @@ class UpdateRequest extends Request
     public function rules()
     {
         return [
-            'client_name' => 'max:255',
+            'client_name' => 'min:3|max:255',
             'client_phone' => 'max:255',
             'client_address' => 'max:255'
         ];

@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests\Orders;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\FormRequest;
 
-class DestroyRequest extends Request
+class DestroyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

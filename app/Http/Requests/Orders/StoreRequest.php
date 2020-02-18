@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Orders;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use App\Order;
+use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRequest extends Request
+class StoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class StoreRequest extends Request
      */
     public function authorize()
     {
-        return $this->user()->can('create');
+        return $this->user()->can('create', Order::class);
     }
 
     /**
@@ -25,7 +25,7 @@ class StoreRequest extends Request
     public function rules()
     {
         return [
-            'client_name' => 'required|max:255',
+            'client_name' => 'required|min:3|max:255',
             'client_phone' => 'required|max:255',
             'client_address' => 'required|max:255'
         ];

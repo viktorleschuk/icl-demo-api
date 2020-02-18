@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Orders;
+namespace App\Http\Requests\OrderItems;
 
+use App\OrderItem;
 use Illuminate\Foundation\Http\FormRequest;
 
-class IndexRequest extends FormRequest
+class ImportRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +25,7 @@ class IndexRequest extends FormRequest
     public function rules()
     {
         return [
-            'page' => 'int',
-            'filter' => 'nullable',
-            'page_size' => 'int'
+            'file' => 'required|file|mimes:csv,txt'
         ];
     }
 }

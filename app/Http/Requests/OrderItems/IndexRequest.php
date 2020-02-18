@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests\OrderItems;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\FormRequest;
 
-class IndexRequest extends Request
+class IndexRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
